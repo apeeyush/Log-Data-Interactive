@@ -1,6 +1,6 @@
 var Analytics = {
 
-  controller: window.parent.DG.currGameController,
+  controller: window.parent.DG,
 
   analyze: function() {
     console.log("I am inside analyze function.");
@@ -23,22 +23,50 @@ var Analytics = {
     this_.controller.doCommand( {
       action: 'createCollection',
       args: {
-        name: 'Logs',
-        attrs: [{ name: 'cases' }, { name: 'Values'}],
+        name: 'Users',
+        attrs: [{ name: 'uname' }],
+        childAttrName: "Logs",
         log: false
       }
     });
+
     this_.controller.doCommand( {
+      action: 'createCollection',
+      args: {
+        name: 'Logs',
+        attrs: [
+          { name: 'event', colormap: { "Started Session": 'green', "Logged In": 'yellow', "Changed Mass": 'red'} }, 
+          { name: 'time'}
+        ],
+        log: false
+      }
+    });
+
+    result = this_.controller.doCommand( {
       action: 'createCases',
       args: {
-        collection: "Logs",
+        collection: "Users",
         values: [
-                  [ "Case 1", 2],
-                  [ "Case 2", 4],
-                  [ "Case 3", 6]
+                  ["User 1"],
+                  ["User 2"],
+                  ["User 3"]
                 ]
       }
     });
+    console.log(result["caseIDs"]);
+    for (var i=0; i<result["caseIDs"].length; i++){
+      this_.controller.doCommand( {
+        action: 'createCases',
+        args: {
+          collection: "Logs",
+          parent: result["caseIDs"][i],
+          values: [
+                    ["Started Session", 2],
+                    ["Logged In", 4],
+                    ["Changed Mass", 6]
+                  ]
+        }
+      });
+    }
   }
-
 };
